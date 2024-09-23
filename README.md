@@ -1,6 +1,10 @@
 # Achievement Watchdog
 
-Achievement Watchdog is a program designed to provide real-time achievement notifications for games using the Goldberg Steam Emulator. It allows users to view their game achievements offline and locally, offering a seamless experience without the need for an internet connection, the official Steam client or any kind of Steam api keys. Currently, it only supports Goldberg Steam Emulator, as other emulators may use different achievement formats.
+Achievement Watchdog is a program designed to provide real-time achievement notifications for games using the Goldberg Steam Emulator. It allows users to view their game achievements offline and locally, offering a seamless experience without the need for an internet connection, the official Steam client, or any kind of Steam API keys. Currently, it only supports Goldberg Steam Emulator, as other emulators may use different achievement formats.
+
+This program was originally created for personal use, but I welcome feedback and suggestions. Feel free to use it however you wish! If anyone is interested in adding a GUI for the Achievement Viewer, that would be great, as I won't be focusing on that.
+
+**Disclaimer:** This software is provided "as is" without any warranties or guarantees. I can't guarantee it will work perfectly in all cases, so use it at your own risk.
 
 ## Features
 
@@ -33,7 +37,7 @@ Achievement Watchdog is a program designed to provide real-time achievement noti
    - Replace it with the emulator version from the `experimental` folder (keep a backup of the original by renaming it).
    - Copy the generated `steam_settings` folder to the same location.
 
-4. **Troubleshooting:** If the game doesn't start or there are issues with the emulator, check [this guide](https://rentry.co/goldberg_emulator) for additional setup instructions.
+4. **Troubleshooting:** If the game doesn't start or there are issues with the emulator (Especially if the game didn't have any steam emulator prior), check [this guide](https://rentry.co/goldberg_emulator) for additional setup instructions, as you might need to bypass SteamStubDRM for certain cases.
 
 ### 2. Set Up Achievement Watchdog
 
