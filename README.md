@@ -25,7 +25,7 @@ This program was originally created for personal use, but I welcome feedback and
 2. Generate the `steam_settings` folder for your game:
    - Open a terminal (Command Prompt or PowerShell).
    - Navigate to the folder where `generate_emu_config.exe` is located.
-   - Run the following command (replace `<game_id>` with your game's ID):
+   - Run the following command (replace `<game_id>` with your game's ID, you can find the game ID of any game through SteamDB):
      ```bash
      generate_emu_config.exe <game_id>
      ```
