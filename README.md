@@ -56,6 +56,7 @@ This program was originally created for personal use, but I welcome feedback and
 ### 3. Using Achievement Watchdog
 
 - **To view achievements:** Run `Achievement Viewer.exe`. This opens a terminal where you can view your achievements.
+   - You can add `-nohide` as an argument (either in a shortcut or via the terminal) to reveal hidden descriptions of certain achievements.
 - **To enable achievement notifications:** Run `Achievement Watchdog.exe`. This will launch the program in the background, with an icon appearing in the system tray. As you unlock achievements, you'll receive notifications on your desktop.
 
 ---
