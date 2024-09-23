@@ -37,7 +37,7 @@ Achievement Watchdog is a program designed to provide real-time achievement noti
 
 ### 2. Set Up Achievement Watchdog
 
-1. Download the latest release of Achievement Watchdog from the **releases page** (URL pending).
+1. Download the latest release of Achievement Watchdog from the [**releases page**](https://github.com/50t0r25/achievement-watchdog/releases).
 2. Extract the files to a folder of your choice.
 3. Open the `.env` file (using Notepad or any text editor) and set your game directories. The file looks like this by default:
    ```bash
