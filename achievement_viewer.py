@@ -85,6 +85,7 @@ os.system('cls' if os.name == 'nt' else 'clear')
 # Display the list of matching games or exit if none found
 if not matching_games:
     print(Fore.RED + "No games found with matching steam_appid.txt files.")
+    input(Fore.WHITE + "\nPress Enter to exit...")
     exit()
 
 print(Fore.WHITE + "Found achievements support for the following installed games:")
@@ -95,13 +96,15 @@ for i, game in enumerate(matching_games, 1):
 try:
     selected_game = matching_games[int(input(Fore.WHITE + "\nChoose game to view achievements for: ")) - 1]
 except (ValueError, IndexError):
-    print(Fore.RED + "Invalid selection. Exiting.")
+    print(Fore.RED + "\nInvalid selection.")
+    input(Fore.WHITE + "\nPress Enter to exit...")
     exit()
 
 # Load local and game achievements
 local_achievements_path = os.path.join(selected_game['local_folder'], "achievements.json")
 if not os.path.exists(local_achievements_path) or not os.path.exists(selected_game['game_achievements_path']):
     print(Fore.RED + "\nMissing achievements.json in local or games folder.")
+    input(Fore.WHITE + "\nPress Enter to exit...")
     exit()
 
 local_achievements = load_json(local_achievements_path)

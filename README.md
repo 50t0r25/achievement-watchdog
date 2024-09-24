@@ -24,7 +24,7 @@ This program was originally created for personal use, but I welcome feedback and
    
 2. Generate the `steam_settings` folder for your game:
    - Open a terminal (Command Prompt or PowerShell).
-   - Navigate to the folder where `generate_emu_config.exe` is located.
+   - Navigate to the folder where `generate_emu_config.exe` is located and open a terminal there.
    - Run the following command (replace `<game_id>` with your game's ID, you can find the game ID of any game through SteamDB):
      ```bash
      generate_emu_config.exe <game_id>
@@ -36,6 +36,7 @@ This program was originally created for personal use, but I welcome feedback and
    - Locate the existing `steam_api.dll` or `steam_api64.dll` file.
    - Replace it with the emulator version from the `experimental` folder (keep a backup of the original by renaming it).
    - Copy the generated `steam_settings` folder to the same location.
+   **Important Note:** If the game has any alternative emulators (often found in "NoDVD" or similar folders in repacks), they need to be either removed or zipped. Having multiple emulators present can confuse Achievement Watchdog and cause issues with achievement tracking.
 
 4. **Troubleshooting:** If the game doesn't start or there are issues with the emulator (Especially if the game didn't have any steam emulator prior), check [this guide](https://rentry.co/goldberg_emulator) for additional setup instructions, as you might need to bypass SteamStubDRM for certain cases.
 
