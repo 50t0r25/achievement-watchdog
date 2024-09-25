@@ -23,18 +23,17 @@ This program was originally created for personal use, but I welcome feedback and
    - Download `generate_emu_config-win.7z` from the same page and extract it.
    
 2. Generate the `steam_settings` folder for your game:
-   - Open a terminal (Command Prompt or PowerShell).
-   - Navigate to the folder where `generate_emu_config.exe` is located and open a terminal there.
+   - Navigate to the folder where `generate_emu_config.exe` is located and open a terminal there (Command Prompt or PowerShell).
    - Run the following command (replace `<game_id>` with your game's ID, you can find the game ID of any game through SteamDB):
      ```bash
      generate_emu_config.exe <game_id>
      ```
-   - This will generate a `steam_settings` folder.
+   - This will generate a `steam_settings` folder inside a folder named `output`.
    
 3. Apply the emulator to your game:
-   - Go to the game folder where you want to enable achievements.
+   - Go to the folder of the game you want achievements to be enabled for.
    - Locate the existing `steam_api.dll` or `steam_api64.dll` file.
-   - Replace it with the emulator version from the `experimental` folder (keep a backup of the original by renaming it).
+   - Replace it with the emulator version from the `experimental` folder (or keep a backup of the original in the game by renaming it).
    - Copy the generated `steam_settings` folder to the same location.
 
    **IMPORTANT NOTE:** If the game has any alternative emulators (often found in "NoDVD" or similar folders in repacks), they need to be either removed or zipped. Having multiple emulators present can confuse Achievement Watchdog and cause issues with achievement tracking.
