@@ -35,33 +35,6 @@ def load_json(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
-# Function to find the most recent earned achievement
-def find_recent_achievement(local_achievements):
-    return max(
-        (ach for ach in local_achievements.items() if ach[1]['earned']),
-        key=lambda x: x[1]['earned_time'], default=(None, None)
-    )[0]
-
-# Function to scan and map local folders to their corresponding achievements paths in the games directory
-def map_local_folders_to_games():
-    game_cache = {}
-    appid_files = glob.glob(f"{games_path}/**/steam_appid.txt", recursive=True)
-
-    for folder in os.listdir(local_achievements_path):
-        folder_name = folder
-        folder_path = os.path.join(local_achievements_path, folder)
-        if not os.path.isdir(folder_path):
-            continue
-
-        # Search for the matching appid in the games folder
-        for appid_file in appid_files:
-            with open(appid_file, 'r', encoding='utf-8') as f:
-                if f.read().strip() == folder_name:
-                    game_achievements_path = os.path.join(os.path.dirname(appid_file), "achievements.json")
-                    game_cache[folder_name] = game_achievements_path
-                    break  # Exit loop once found
-    return game_cache
-
 # Find matching games with steam_appid.txt (normal mode)
 matching_games = []
 appid_files = glob.glob(f"{games_path}/**/steam_appid.txt", recursive=True)
@@ -84,7 +57,7 @@ os.system('cls' if os.name == 'nt' else 'clear')
 
 # Display the list of matching games or exit if none found
 if not matching_games:
-    print(Fore.RED + "No games found with matching steam_appid.txt files.")
+    print(Fore.LIGHTRED_EX + "No games found with matching steam_appid.txt files.")
     input(Fore.WHITE + "\nPress Enter to exit...")
     exit()
 
@@ -96,14 +69,14 @@ for i, game in enumerate(matching_games, 1):
 try:
     selected_game = matching_games[int(input(Fore.WHITE + "\nChoose game to view achievements for: ")) - 1]
 except (ValueError, IndexError):
-    print(Fore.RED + "\nInvalid selection.")
+    print(Fore.LIGHTRED_EX + "\nInvalid selection.")
     input(Fore.WHITE + "\nPress Enter to exit...")
     exit()
 
 # Load local and game achievements
 local_achievements_path = os.path.join(selected_game['local_folder'], "achievements.json")
 if not os.path.exists(local_achievements_path) or not os.path.exists(selected_game['game_achievements_path']):
-    print(Fore.RED + "\nMissing achievements.json in local or games folder.")
+    print(Fore.LIGHTRED_EX + "\nMissing achievements.json in local or games folder.")
     input(Fore.WHITE + "\nPress Enter to exit...")
     exit()
 
@@ -132,7 +105,14 @@ for game_achievement in game_achievements:
         else:
             print(Fore.WHITE + "Description: " + Fore.CYAN + game_achievement['description']['english'])
 
-        print(Fore.WHITE + "Earned: " + (Fore.GREEN if earned else Fore.RED) + ('Yes' if earned else 'No') + Fore.WHITE + " | Earned Time: " + (Fore.GREEN if earned else Fore.CYAN) + earned_time)
+        # Check for progress tracking
+        if 'progress' in local_achievement and 'max_progress' in local_achievement:
+            progress = local_achievement['progress']
+            max_progress = local_achievement['max_progress']
+            progress_percent = (progress / max_progress) * 100
+            print(Fore.WHITE + f"Progress: " + (Fore.GREEN if earned else Fore.LIGHTRED_EX) + f"{progress_percent:.1f}% ({progress}/{max_progress})")
+
+        print(Fore.WHITE + "Earned: " + (Fore.GREEN if earned else Fore.LIGHTRED_EX) + ('Yes' if earned else 'No') + Fore.WHITE + " | Earned Time: " + (Fore.GREEN if earned else Fore.CYAN) + earned_time)
         print(Fore.WHITE + "\n--------------------------------------\n")
 
 # Display the percentage of achievements earned
