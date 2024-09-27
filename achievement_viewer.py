@@ -110,7 +110,7 @@ for game_achievement in game_achievements:
             progress = local_achievement['progress']
             max_progress = local_achievement['max_progress']
             progress_percent = (progress / max_progress) * 100
-            print(Fore.WHITE + f"Progress: " + (Fore.GREEN if earned else Fore.LIGHTRED_EX) + f"{progress_percent:.1f}% ({progress}/{max_progress})")
+            print(Fore.WHITE + "Progress: " + (Fore.GREEN if earned else Fore.LIGHTRED_EX) + f"{progress_percent:.1f}% ({progress}/{max_progress})")
 
         print(Fore.WHITE + "Earned: " + (Fore.GREEN if earned else Fore.LIGHTRED_EX) + ('Yes' if earned else 'No') + Fore.WHITE + " | Earned Time: " + (Fore.GREEN if earned else Fore.CYAN) + earned_time)
         print(Fore.WHITE + "\n--------------------------------------\n")

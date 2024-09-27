@@ -5,7 +5,6 @@ import time
 import glob
 import threading
 import logging
-from datetime import datetime, timezone
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import asyncio
@@ -31,26 +30,50 @@ def find_recent_achievement(local_achievements):
     return max(
         (ach for ach in local_achievements.items() if ach[1]['earned']),
         key=lambda x: x[1]['earned_time'], default=(None, None)
-    )[0]
+    )
 
 # Function to scan and map local folders to their corresponding achievements paths in the games directory
 def map_local_folders_to_games():
+    global local_achievements_path, games_path
     game_cache = {}
+
+    # Find all steam_appid.txt files in the games folder
     appid_files = glob.glob(f"{games_path}/**/steam_appid.txt", recursive=True)
 
+    # Go through each folder in the local achievements path
     for folder in os.listdir(local_achievements_path):
         folder_name = folder
         folder_path = os.path.join(local_achievements_path, folder)
-        if not os.path.isdir(folder_path):
-            continue
 
-        # Search for the matching appid in the games folder
+        # Ensure it's a directory and has an achievements.json file inside it
+        local_achievements_file = os.path.join(folder_path, "achievements.json")
+        if not os.path.isdir(folder_path) or not os.path.exists(local_achievements_file):
+            continue  # Skip folders without achievements.json
+        
+        # Find the corresponding steam_appid.txt in the games folder
         for appid_file in appid_files:
             with open(appid_file, 'r', encoding='utf-8') as f:
-                if f.read().strip() == folder_name:
-                    game_achievements_path = os.path.join(os.path.dirname(appid_file), "achievements.json")
-                    game_cache[folder_name] = game_achievements_path
-                    break  # Exit loop once found
+                appid = f.read().strip()
+
+                # Check if the appid matches the local achievements folder name
+                if appid == folder_name:
+                    # Find the achievements.json in the same folder as steam_appid.txt
+                    game_achievements_file = os.path.join(os.path.dirname(appid_file), "achievements.json")
+                    if os.path.exists(game_achievements_file):
+                        # Load the local achievements.json and find the most recent earned achievement
+                        local_achievements = load_json(local_achievements_file)
+                        recent_achievement = find_recent_achievement(local_achievements)
+                        last_earned_time = recent_achievement[1]['earned_time'] if recent_achievement[1] else 0
+
+                        # Cache the path to the game's achievements.json and the last earned timestamp
+                        game_cache[folder_name] = {
+                            "achievements_path": game_achievements_file,
+                            "last_earned_time": last_earned_time
+                        }
+
+                        # Move on to the next local folder once the match is found
+                        break
+    
     return game_cache
 
 # Watchdog handler class
@@ -58,8 +81,6 @@ class AchievementHandler(FileSystemEventHandler):
     def __init__(self, game_cache):
         super().__init__()
         self.game_cache = game_cache
-        self.last_achievement = None
-        self.last_notification_time = 0
 
     def on_modified(self, event):
         self.process_achievement_file(event)
@@ -86,7 +107,18 @@ class AchievementHandler(FileSystemEventHandler):
                 with open(appid_file, 'r', encoding='utf-8') as f:
                     if f.read().strip() == folder_name:
                         game_achievements_path = os.path.join(os.path.dirname(appid_file), "achievements.json")
-                        self.game_cache[folder_name] = game_achievements_path
+                        #local_achievements_path = event.src_path
+
+                        # Load local achievements and get the most recent achievement's timestamp
+                        #local_achievements = load_json(local_achievements_path)
+                        #recent_achievement = find_recent_achievement(local_achievements)
+                        #last_earned_time = recent_achievement[1]['earned_time'] if recent_achievement[1] else 0
+                        
+                        # Cache the achievements path and last earned achievement's timestamp
+                        self.game_cache[folder_name] = {
+                            "achievements_path": game_achievements_path,
+                            "last_earned_time": 0 # Hardcoded 0 to always attempt sending a notification for newly added achievements files
+                        }
                         logging.info(f"Added {folder_name} to cache with achievements path {game_achievements_path}")
                         break
             else:
@@ -94,39 +126,38 @@ class AchievementHandler(FileSystemEventHandler):
                 return
 
         # Process achievements in the cached folder
-        game_achievements_path = self.game_cache[folder_name]
+        game_data = self.game_cache[folder_name]
         local_achievements = load_json(event.src_path)
-        recent_achievement_name = find_recent_achievement(local_achievements)
+        recent_achievement_name, recent_achievement_data = find_recent_achievement(local_achievements)
 
         if not recent_achievement_name:
-            logging.warning("No recent achievement found in the achievements.json file.")
-            return  # No recent achievement found
+            logging.info("No earned achievements found in the achievements.json file.")
+            return  # No earned achievements found
         
-        try:
-            game_achievements = load_json(game_achievements_path)
-        except Exception as e:
-            logging.error(f"Error loading achievements.json for folder {folder_name}: {e}")
-            return
-        
-        recent_achievement = next((ach for ach in game_achievements if ach['name'] == recent_achievement_name), None)
+        # Check if the recent achievement is newer than the cached last earned time
+        if recent_achievement_data['earned_time'] > game_data['last_earned_time']:
+            try:
+                game_achievements = load_json(game_data["achievements_path"])
+                recent_achievement = next((ach for ach in game_achievements if ach['name'] == recent_achievement_name), None)
+                
+                if recent_achievement:
+                    icon_path = recent_achievement.get('icon', None)
+                    if icon_path:
+                        icon_path = os.path.join(os.path.dirname(game_data["achievements_path"]), icon_path)
+                    asyncio.run(self.send_notification(
+                        recent_achievement['displayName']['english'],
+                        recent_achievement['description']['english'],
+                        icon_path
+                    ))
 
-        if recent_achievement and self._check_duplicate(recent_achievement_name):
-            icon_path = recent_achievement.get('icon', None)
-            if icon_path:
-                icon_path = os.path.join(os.path.dirname(game_achievements_path), icon_path)
-            asyncio.run(self.send_notification(
-                recent_achievement['displayName']['english'],
-                recent_achievement['description']['english'],
-                icon_path
-            ))
+                    # Update the last earned timestamp in cache
+                    self.game_cache[folder_name]['last_earned_time'] = recent_achievement_data['earned_time']
 
-    def _check_duplicate(self, achievement_name):
-        current_time = time.time()
-        if self.last_achievement == achievement_name and current_time - self.last_notification_time < 2:
-            logging.info(f"Skipping duplicate notification for {achievement_name}")
-            return False
-        self.last_achievement, self.last_notification_time = achievement_name, current_time
-        return True
+            except Exception as e:
+                logging.error(f"Error loading achievements.json for folder {folder_name}: {e}")
+                return
+        else:
+            logging.info(f"No new achievements found for {folder_name}. Last earned achievement is up to date.")
 
     # Async function to display toast notifications
     async def send_notification(self, title, description, icon_path=None):
