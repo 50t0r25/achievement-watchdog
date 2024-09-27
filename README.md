@@ -64,7 +64,7 @@ This program was originally created for personal use, but I welcome feedback and
 
 ## Usage Notes
 
-1. **Disable Do Not Disturb (Focus Assit on Windows 10):** Ensure that Windows notifications are not blocked while gaming. Go to:
+1. **Disable Do Not Disturb (Focus Assist on Windows 10):** Ensure that Windows notifications are not blocked while gaming. Go to:
    - **Settings > System > Notifications** 
    - Disable "Turn on do not disturb automatically when playing a game."
    - Notifications will not appear if this setting is enabled.
