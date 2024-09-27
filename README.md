@@ -64,12 +64,12 @@ This program was originally created for personal use, but I welcome feedback and
 
 ## Usage Notes
 
-1. **Disable Do Not Disturb:** Ensure that Windows notifications are not blocked while gaming. Go to:
+1. **Disable Do Not Disturb (Focus Assit on Windows 10):** Ensure that Windows notifications are not blocked while gaming. Go to:
    - **Settings > System > Notifications** 
    - Disable "Turn on do not disturb automatically when playing a game."
    - Notifications will not appear if this setting is enabled.
 
-2. **Achievements Viewer Requires At Least One Achievement Unlocked:** The Achievement Viewer will not display achievements for a game until you have unlocked at least one achievement.
+2. **Achievements Viewer Requires At Least One Achievement Unlocked:** The Achievement Viewer might or might not display achievements for a game until you have unlocked at least one achievement.
 
 3. **Notifications Work Independently:** Achievement Watchdog does **not** need to be running to unlock achievements. It only serves to send notifications when you unlock achievements during gameplay.
 
