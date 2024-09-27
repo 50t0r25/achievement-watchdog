@@ -13,6 +13,10 @@ This program was originally created for personal use, but I welcome feedback and
 - **Custom Notification Sounds:** Easily customize the achievement notification sound.
 - **System Tray Support:** Run in the background with a system tray icon for easy access and management.
 
+<p align="center">
+  <img src="./screenshot/demo.gif">
+</p>
+
 ## Setup Instructions
 
 ### 1. Download and Configure Goldberg Emulator
