@@ -2,7 +2,7 @@ import os
 import json
 import glob
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime
 from colorama import init, Fore
 from dotenv import load_dotenv # type: ignore
 
@@ -14,7 +14,7 @@ init(autoreset=True)
 
 # Function to convert Unix time to a readable format
 def convert_from_unixtime(unix_time):
-    return (Fore.GREEN + datetime.fromtimestamp(unix_time, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+    return (Fore.GREEN + datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d %H:%M:%S')
             if unix_time > 0 else Fore.CYAN + "Not Earned")
 
 # Parse command-line arguments
