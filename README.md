@@ -2,7 +2,7 @@
 
 Achievement Watchdog is a program designed to provide real-time achievement notifications for games using the Goldberg Steam Emulator. It allows users to view their game achievements offline and locally, offering a seamless experience without the need for an internet connection, the official Steam client, or any kind of Steam API keys. Currently, it only supports Goldberg Steam Emulator, as other emulators may use different achievement formats.
 
-This program was originally created for personal use, but I welcome feedback and suggestions. Feel free to use it however you wish! If anyone is interested in adding a GUI for the Achievement Viewer, that would be great, as I won't be focusing on that.
+This program was originally created for personal use, but I welcome feedback and suggestions. Feel free to use it however you wish! If anyone is interested in adding a GUI for the Achievement Viewer, that would be great, as I won't be focusing on that **yet**.
 
 **Disclaimer:** This software is provided "as is" without any warranties or guarantees. I can't guarantee it will work perfectly in all cases, so use it at your own risk.
 
@@ -13,9 +13,12 @@ This program was originally created for personal use, but I welcome feedback and
 - **Custom Notification Sounds:** Easily customize the achievement notification sound.
 - **System Tray Support:** Run in the background with a system tray icon for easy access and management.
 
-<p align="center">
-  <img src="./screenshot/demo.gif">
-</p>
+<table>
+  <tr>
+    <td align="left" width="70%"><img src="./screenshot/demo.gif" width="100%"></td>
+    <td align="left" width="30%"><img src="./screenshot/screenshot-notif.png" width="100%"></td>
+  </tr>
+</table>
 
 ## Setup Instructions
 
@@ -52,9 +55,11 @@ This program was originally created for personal use, but I welcome feedback and
    ```bash
    LOCAL_ACHIEVEMENTS_PATH=%appdata%\GSE saves\
    GAMES_PATH=C:\games
+   LANGUAGE=english
    ```
    - **LOCAL_ACHIEVEMENTS_PATH** should not be changed if you followed the Goldberg setup steps.
    - **GAMES_PATH** should point to the folder where your games are installed.
+   - **LANGUAGE** is the preferred language for the achievement descriptions. If the selected language is not available for a game, it will automatically default to English.
 
 4. You can also customize the notification sound by replacing the `achievement_sound.mp3` file (keep the same name).
 
