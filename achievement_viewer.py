@@ -26,6 +26,9 @@ args = parser.parse_args()
 local_achievements_path = os.getenv("LOCAL_ACHIEVEMENTS_PATH", r"%appdata%\GSE saves")
 games_path = os.getenv("GAMES_PATH", r"C:\games")
 
+# Load the preferred language from the environment variable (default to 'english')
+preferred_language = os.getenv('LANGUAGE', 'english')
+
 # Resolve environment variables like %appdata% to actual paths
 local_achievements_path = os.path.expandvars(local_achievements_path)
 games_path = os.path.expandvars(games_path)
@@ -34,6 +37,11 @@ games_path = os.path.expandvars(games_path)
 def load_json(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+# Function to get the achievement text in the preferred language, with a fallback to English
+def get_achievement_text(recent_achievement, key):
+    return recent_achievement.get(key, {}).get(preferred_language) or \
+           recent_achievement.get(key, {}).get('english', 'Unknown')
 
 # Find matching games with steam_appid.txt (normal mode)
 matching_games = []
@@ -97,13 +105,13 @@ for game_achievement in game_achievements:
         earned = local_achievement['earned']
         earned_time = convert_from_unixtime(local_achievement['earned_time'])
 
-        # Display achievement details
-        print(Fore.WHITE + "Achievement: " + Fore.CYAN + game_achievement['displayName']['english'])
+        # Display achievement details using the preferred language with a fallback to English
+        print(Fore.WHITE + "Achievement: " + Fore.CYAN + get_achievement_text(game_achievement, 'displayName'))
 
         if game_achievement.get('hidden', 0) == 1 and not earned and not args.nohide:
             print(Fore.YELLOW + "This achievement is hidden.")
         else:
-            print(Fore.WHITE + "Description: " + Fore.CYAN + game_achievement['description']['english'])
+            print(Fore.WHITE + "Description: " + Fore.CYAN + get_achievement_text(game_achievement, 'description'))
 
         # Check for progress tracking
         if 'progress' in local_achievement and 'max_progress' in local_achievement:

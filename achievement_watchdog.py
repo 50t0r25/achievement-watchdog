@@ -25,6 +25,11 @@ def load_json(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
+# Function to get the display text for a specific language, with fallback to English
+def get_display_text(recent_achievement, key, language):
+    # Attempt to get the text in the specified language; fallback to English if not available
+    return recent_achievement.get(key, {}).get(language) or recent_achievement.get(key, {}).get('english', 'Unknown')
+
 # Function to find the most recent earned achievement
 def find_recent_achievement(local_achievements):
     return max(
@@ -81,6 +86,7 @@ class AchievementHandler(FileSystemEventHandler):
     def __init__(self, game_cache):
         super().__init__()
         self.game_cache = game_cache
+        self.language = os.getenv('LANGUAGE', 'english')  # Load the language from the environment variable
 
     def on_modified(self, event):
         self.process_achievement_file(event)
@@ -149,11 +155,11 @@ class AchievementHandler(FileSystemEventHandler):
                     icon_path = recent_achievement.get('icon', None)
                     if icon_path:
                         icon_path = os.path.join(os.path.dirname(game_data["achievements_path"]), icon_path)
-                    asyncio.run(self.send_notification(
-                        recent_achievement['displayName']['english'],
-                        recent_achievement['description']['english'],
-                        icon_path
-                    ))
+
+                    title = get_display_text(recent_achievement, 'displayName', self.language)
+                    description = get_display_text(recent_achievement, 'description', self.language)
+
+                    asyncio.run(self.send_notification(title, description, icon_path))
 
                     # Update the last earned timestamp in cache to the latest achievement
                     if achievement_data['earned_time'] > game_data['last_earned_time']:
