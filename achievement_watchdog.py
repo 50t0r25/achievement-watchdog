@@ -128,17 +128,22 @@ class AchievementHandler(FileSystemEventHandler):
         # Process achievements in the cached folder
         game_data = self.game_cache[folder_name]
         local_achievements = load_json(event.src_path)
-        recent_achievement_name, recent_achievement_data = find_recent_achievement(local_achievements)
 
-        if not recent_achievement_name:
-            logging.info("No earned achievements found in the achievements.json file.")
-            return  # No earned achievements found
+        # Loop through all achievements and find those that are newly earned
+        new_achievements = [
+            (name, data) for name, data in local_achievements.items()
+            if data['earned'] and data['earned_time'] > game_data['last_earned_time']
+        ]
+
+        if not new_achievements:
+            logging.info(f"No new achievements found for {folder_name}. Last earned achievement is up to date.")
+            return  # No new achievements found
         
-        # Check if the recent achievement is newer than the cached last earned time
-        if recent_achievement_data['earned_time'] > game_data['last_earned_time']:
-            try:
-                game_achievements = load_json(game_data["achievements_path"])
-                recent_achievement = next((ach for ach in game_achievements if ach['name'] == recent_achievement_name), None)
+        try:
+            game_achievements = load_json(game_data["achievements_path"])
+
+            for achievement_name, achievement_data in new_achievements:
+                recent_achievement = next((ach for ach in game_achievements if ach['name'] == achievement_name), None)
                 
                 if recent_achievement:
                     icon_path = recent_achievement.get('icon', None)
@@ -150,14 +155,12 @@ class AchievementHandler(FileSystemEventHandler):
                         icon_path
                     ))
 
-                    # Update the last earned timestamp in cache
-                    self.game_cache[folder_name]['last_earned_time'] = recent_achievement_data['earned_time']
+                    # Update the last earned timestamp in cache to the latest achievement
+                    if achievement_data['earned_time'] > game_data['last_earned_time']:
+                        self.game_cache[folder_name]['last_earned_time'] = achievement_data['earned_time']
 
-            except Exception as e:
-                logging.error(f"Error loading achievements.json for folder {folder_name}: {e}")
-                return
-        else:
-            logging.info(f"No new achievements found for {folder_name}. Last earned achievement is up to date.")
+        except Exception as e:
+            logging.error(f"Error loading achievements.json for folder {folder_name}: {e}")
 
     # Async function to display toast notifications
     async def send_notification(self, title, description, icon_path=None):
@@ -175,7 +178,6 @@ def stop_watchdog(observer, icon):
     observer.join()
     icon.stop()
 
-# Function to start system tray
 def resource_path(relative_path):
     """ Get absolute path to resource, works for both dev and PyInstaller """
     try:
@@ -184,6 +186,7 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
+# Function to start system tray
 def start_tray(observer):
     # Load the tray icon image
     image_path = resource_path("achievement.png")
