@@ -37,47 +37,49 @@ def find_recent_achievement(local_achievements):
         key=lambda x: x[1]['earned_time'], default=(None, None)
     )
 
-# Function to scan and map local folders to their corresponding achievements paths in the games directory
+# Function to scan and map local folders to their corresponding achievements paths in the games directories
 def map_local_folders_to_games():
-    global local_achievements_path, games_path
+    global local_achievements_path, games_paths
     game_cache = {}
 
-    # Find all steam_appid.txt files in the games folder
-    appid_files = glob.glob(f"{games_path}/**/steam_appid.txt", recursive=True)
+    # Loop through each game path in the list
+    for game_path in games_paths:
+        # Find all steam_appid.txt files in the current game path
+        appid_files = glob.glob(f"{game_path}/**/steam_appid.txt", recursive=True)
 
-    # Go through each folder in the local achievements path
-    for folder in os.listdir(local_achievements_path):
-        folder_name = folder
-        folder_path = os.path.join(local_achievements_path, folder)
+        # Go through each folder in the local achievements path
+        for folder in os.listdir(local_achievements_path):
+            folder_name = folder
+            folder_path = os.path.join(local_achievements_path, folder)
 
-        # Ensure it's a directory and has an achievements.json file inside it
-        local_achievements_file = os.path.join(folder_path, "achievements.json")
-        if not os.path.isdir(folder_path) or not os.path.exists(local_achievements_file):
-            continue  # Skip folders without achievements.json
-        
-        # Find the corresponding steam_appid.txt in the games folder
-        for appid_file in appid_files:
-            with open(appid_file, 'r', encoding='utf-8') as f:
-                appid = f.read().strip()
+            # Ensure it's a directory and has an achievements.json file inside it
+            local_achievements_file = os.path.join(folder_path, "achievements.json")
+            if not os.path.isdir(folder_path) or not os.path.exists(local_achievements_file):
+                continue  # Skip folders without achievements.json
 
-                # Check if the appid matches the local achievements folder name
-                if appid == folder_name:
-                    # Find the achievements.json in the same folder as steam_appid.txt
-                    game_achievements_file = os.path.join(os.path.dirname(appid_file), "achievements.json")
-                    if os.path.exists(game_achievements_file):
-                        # Load the local achievements.json and find the most recent earned achievement
-                        local_achievements = load_json(local_achievements_file)
-                        recent_achievement = find_recent_achievement(local_achievements)
-                        last_earned_time = recent_achievement[1]['earned_time'] if recent_achievement[1] else 0
+            # Find the corresponding steam_appid.txt in the games folder
+            for appid_file in appid_files:
+                with open(appid_file, 'r', encoding='utf-8') as f:
+                    appid = f.read().strip()
 
-                        # Cache the path to the game's achievements.json and the last earned timestamp
-                        game_cache[folder_name] = {
-                            "achievements_path": game_achievements_file,
-                            "last_earned_time": last_earned_time
-                        }
+                    # Check if the appid matches the local achievements folder name
+                    if appid == folder_name:
+                        # Find the achievements.json in the same folder as steam_appid.txt
+                        game_achievements_file = os.path.join(os.path.dirname(appid_file), "achievements.json")
+                        if os.path.exists(game_achievements_file):
+                            # Load the local achievements.json and find the most recent earned achievement
+                            local_achievements = load_json(local_achievements_file)
+                            recent_achievement = find_recent_achievement(local_achievements)
+                            last_earned_time = recent_achievement[1]['earned_time'] if recent_achievement[1] else 0
 
-                        # Move on to the next local folder once the match is found
-                        break
+                            # Cache the path to the game's achievements.json and the last earned timestamp
+                            game_cache[folder_name] = {
+                                "achievements_path": game_achievements_file,
+                                "last_earned_time": last_earned_time
+                            }
+
+                            # Move on to the next local folder once the match is found
+                            break
     
     return game_cache
 
@@ -108,25 +110,27 @@ class AchievementHandler(FileSystemEventHandler):
         if folder_name not in self.game_cache:
             # If the folder is not in the cache, attempt to add it
             logging.info(f"Folder {folder_name} not in cache. Attempting to add.")
-            appid_files = glob.glob(f"{games_path}/**/steam_appid.txt", recursive=True)
-            for appid_file in appid_files:
-                with open(appid_file, 'r', encoding='utf-8') as f:
-                    if f.read().strip() == folder_name:
-                        game_achievements_path = os.path.join(os.path.dirname(appid_file), "achievements.json")
-                        #local_achievements_path = event.src_path
 
-                        # Load local achievements and get the most recent achievement's timestamp
-                        #local_achievements = load_json(local_achievements_path)
-                        #recent_achievement = find_recent_achievement(local_achievements)
-                        #last_earned_time = recent_achievement[1]['earned_time'] if recent_achievement[1] else 0
-                        
-                        # Cache the achievements path and last earned achievement's timestamp
-                        self.game_cache[folder_name] = {
-                            "achievements_path": game_achievements_path,
-                            "last_earned_time": 0 # Hardcoded 0 to always attempt sending a notification for newly added achievements files
-                        }
-                        logging.info(f"Added {folder_name} to cache with achievements path {game_achievements_path}")
-                        break
+            # Loop through each game path to find the steam_appid.txt file
+            for game_path in games_paths:
+                appid_files = glob.glob(f"{game_path}/**/steam_appid.txt", recursive=True)
+                for appid_file in appid_files:
+                    with open(appid_file, 'r', encoding='utf-8') as f:
+                        if f.read().strip() == folder_name:
+                            game_achievements_path = os.path.join(os.path.dirname(appid_file), "achievements.json")
+
+                            # Cache the achievements path and last earned achievement's timestamp
+                            self.game_cache[folder_name] = {
+                                "achievements_path": game_achievements_path,
+                                "last_earned_time": 0  # Always attempt sending a notification for newly added achievements files
+                            }
+                            logging.info(f"Added {folder_name} to cache with achievements path {game_achievements_path}")
+                            break
+                else:
+                    # Continue to the next game path if not found in the current one
+                    continue
+                # If found, break out of the outer loop
+                break
             else:
                 logging.error(f"Unable to find matching appid for folder {folder_name}. Skipping.")
                 return
@@ -233,11 +237,11 @@ def run_watchdog_mode():
 
 # Load paths from environment variables (with defaults)
 local_achievements_path = os.getenv("LOCAL_ACHIEVEMENTS_PATH", r"%appdata%\GSE saves")
-games_path = os.getenv("GAMES_PATH", r"C:\games")
+games_paths = os.getenv("GAMES_PATH", r"C:\games").split(';')
 
 # Resolve environment variables like %appdata% to actual paths
 local_achievements_path = os.path.expandvars(local_achievements_path)
-games_path = os.path.expandvars(games_path)
+games_paths = [os.path.expandvars(path.strip()) for path in games_paths]
 
 # Run the watchdog mode by default
 run_watchdog_mode()
