@@ -24,14 +24,14 @@ args = parser.parse_args()
 
 # Load paths from environment variables (with defaults)
 local_achievements_path = os.getenv("LOCAL_ACHIEVEMENTS_PATH", r"%appdata%\GSE saves")
-games_path = os.getenv("GAMES_PATH", r"C:\games")
+games_paths = os.getenv("GAMES_PATH", r"C:\games").split(';')  # Support multiple paths separated by ';'
 
 # Load the preferred language from the environment variable (default to 'english')
 preferred_language = os.getenv('LANGUAGE', 'english')
 
 # Resolve environment variables like %appdata% to actual paths
 local_achievements_path = os.path.expandvars(local_achievements_path)
-games_path = os.path.expandvars(games_path)
+games_paths = [os.path.expandvars(path.strip()) for path in games_paths]
 
 # Function to load JSON data from a file
 def load_json(file_path):
@@ -43,22 +43,24 @@ def get_achievement_text(recent_achievement, key):
     return recent_achievement.get(key, {}).get(preferred_language) or \
            recent_achievement.get(key, {}).get('english', 'Unknown')
 
-# Find matching games with steam_appid.txt (normal mode)
+# Find matching games with steam_appid.txt in all game paths
 matching_games = []
-appid_files = glob.glob(f"{games_path}/**/steam_appid.txt", recursive=True)
 
-for folder in os.listdir(local_achievements_path):
-    folder_name = folder
-    for appid_file in appid_files:
-        with open(appid_file, 'r', encoding='utf-8') as f:
-            if f.read().strip() == folder_name:
-                root_folder = os.path.relpath(os.path.dirname(appid_file), games_path).split(os.sep)[0]
-                matching_games.append({
-                    "name": folder_name,
-                    "root_folder": root_folder,
-                    "local_folder": os.path.join(local_achievements_path, folder_name),
-                    "game_achievements_path": os.path.join(os.path.dirname(appid_file), "achievements.json")
-                })
+for game_path in games_paths:
+    appid_files = glob.glob(f"{game_path}/**/steam_appid.txt", recursive=True)
+
+    for folder in os.listdir(local_achievements_path):
+        folder_name = folder
+        for appid_file in appid_files:
+            with open(appid_file, 'r', encoding='utf-8') as f:
+                if f.read().strip() == folder_name:
+                    root_folder = os.path.relpath(os.path.dirname(appid_file), game_path).split(os.sep)[0]
+                    matching_games.append({
+                        "name": folder_name,
+                        "root_folder": root_folder,
+                        "local_folder": os.path.join(local_achievements_path, folder_name),
+                        "game_achievements_path": os.path.join(os.path.dirname(appid_file), "achievements.json")
+                    })
 
 # Clear the screen
 os.system('cls' if os.name == 'nt' else 'clear')
