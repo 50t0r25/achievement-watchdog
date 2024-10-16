@@ -51,17 +51,17 @@ This program was originally created for personal use, but I welcome feedback and
 
 1. Download the latest release of Achievement Watchdog from the [**releases page**](https://github.com/50t0r25/achievement-watchdog/releases).
 2. Extract the files to a folder of your choice.
-3. Open the `.env` file (using Notepad or any text editor) and set your game directories. The file looks like this by default:
+3. Open the `.env` file (using Notepad or any text editor) and edit the settings as you wish. The file looks like this by default:
    ```bash
    LOCAL_ACHIEVEMENTS_PATH=%appdata%\GSE saves\
-   GAMES_PATH=C:\games
+   GAMES_PATH=C:\Games\
    LANGUAGE=english
    ```
    - **LOCAL_ACHIEVEMENTS_PATH** should not be changed if you followed the Goldberg setup steps.
-   - **GAMES_PATH** should point to the folder where your games are installed.
+   - **GAMES_PATH** should point to the folder where your games are installed, you can add several paths seperated with a `;`. Example: `GAMES_PATH=C:\Games\ ; D:\Games ; C:\OtherPath\Games\`
    - **LANGUAGE** is the preferred language for the achievement descriptions. If the selected language is not available for a game, it will automatically default to English.
 
-4. You can also customize the notification sound by replacing the `achievement_sound.mp3` file (keep the same name).
+4. You can also customize the notification sound by replacing the `achievement_sound.mp3` file (keep the same filename).
 
 ### 3. Using Achievement Watchdog
 
@@ -80,7 +80,7 @@ This program was originally created for personal use, but I welcome feedback and
 
 2. **Achievements Viewer Requires At Least One Achievement Unlocked:** The Achievement Viewer might or might not display achievements for a game until you have unlocked at least one achievement.
 
-3. **Notifications Work Independently:** Achievement Watchdog does **not** need to be running to unlock achievements. It only serves to send notifications when you unlock achievements during gameplay.
+3. **Notifications Work Independently:** Achievement Watchdog does **NOT** need to be running to unlock achievements. It only serves to send notifications when you unlock achievements during gameplay.
 
 ---
 
