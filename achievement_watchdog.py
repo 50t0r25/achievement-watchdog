@@ -102,7 +102,7 @@ class AchievementHandler(FileSystemEventHandler):
             return
         
         # Log every file modification/creation event
-        logging.info(f"File created/modified: {event.src_path}")
+        logging.info(f"File modified: {event.src_path}")
 
         folder_name = os.path.basename(os.path.dirname(event.src_path))
 
