@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import glob
 import argparse
@@ -66,7 +67,7 @@ for game_path in games_paths:
 if not matching_games:
     print(Fore.LIGHTRED_EX + "No games found with matching steam_appid.txt files.")
     input(Fore.WHITE + "\nPress Enter to exit...")
-    exit()
+    sys.exit()
 
 print(Fore.WHITE + "Found achievements support for the following installed games:")
 for i, game in enumerate(matching_games, 1):
@@ -78,14 +79,14 @@ try:
 except (ValueError, IndexError):
     print(Fore.LIGHTRED_EX + "\nInvalid selection.")
     input(Fore.WHITE + "\nPress Enter to exit...")
-    exit()
+    sys.exit()
 
 # Load local and game achievements
 local_achievements_path = os.path.join(selected_game['local_folder'], "achievements.json")
 if not os.path.exists(local_achievements_path) or not os.path.exists(selected_game['game_achievements_path']):
     print(Fore.LIGHTRED_EX + "\nMissing achievements.json in local or games folder.")
     input(Fore.WHITE + "\nPress Enter to exit...")
-    exit()
+    sys.exit()
 
 local_achievements = load_json(local_achievements_path)
 game_achievements = load_json(selected_game['game_achievements_path'])
