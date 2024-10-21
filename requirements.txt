@@ -1,0 +1,6 @@
+watchdog
+pystray
+Pillow
+win11toast
+python-dotenv
+colorama

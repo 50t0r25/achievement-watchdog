@@ -1,0 +1,63 @@
+name: Build and Package Achievement Watchdog
+
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # Step 3: Install required dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install -r requirements.txt
+
+      # Step 4: Compile Achievement Watchdog executable
+      - name: Build Achievement Watchdog
+        run: |
+          pyinstaller --noconsole --add-data "assets\\achievement.png;." --icon "assets\\achievement.ico" --name "Achievement Watchdog" --optimize 2 --onefile .\achievement_watchdog.py
+
+      # Step 5: Compile Achievement Viewer executable
+      - name: Build Achievement Viewer
+        run: |
+          pyinstaller --icon "assets\\achievement_av.ico" --name "Achievement Viewer" --optimize 2 --onefile .\achievement_viewer.py
+
+      # Step 6: Add additional files to the dist directory
+      - name: Copy additional files
+        run: |
+          copy .env dist\\
+          copy assets\\achievement_sound.mp3 dist\\
+
+      # Step 7: Compress files into a .7z archive using 7-Zip
+      - name: Install 7-Zip
+        run: choco install 7zip -y
+
+      - name: Create 7-Zip archive
+        run: |
+          "C:\\Program Files\\7-Zip\\7z.exe" a -t7z -mx9 Achievement.Watchdog.7z dist\\*
+
+      # Step 8: Upload the artifact for later download
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Achievement.Watchdog
+          path: Achievement.Watchdog.7z
