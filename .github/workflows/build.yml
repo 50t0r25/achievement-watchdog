@@ -1,4 +1,4 @@
-name: Build and Package Achievement Watchdog
+name: Build
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
 
       # Step 2: Set up Python environment
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -41,23 +41,23 @@ jobs:
         run: |
           pyinstaller --icon "assets\\achievement_av.ico" --name "Achievement Viewer" --optimize 2 --onefile .\achievement_viewer.py
 
-      # Step 6: Add additional files to the dist directory
+      # Step 6: Verify and Rename the dist directory
+      - name: Rename dist directory
+        run: |
+          ren dist "Achievement Watchdog"
+
+      # Step 7: Add additional files to the renamed directory
       - name: Copy additional files
         run: |
-          copy .env dist\\
-          copy assets\\achievement_sound.mp3 dist\\
+          copy .env "Achievement Watchdog\\"
+          copy assets\\achievement_sound.mp3 "Achievement Watchdog\\"
 
-      # Step 7: Compress files into a .7z archive using 7-Zip
-      - name: Install 7-Zip
-        run: choco install 7zip -y
-
-      - name: Create 7-Zip archive
-        run: |
-          "C:\\Program Files\\7-Zip\\7z.exe" a -t7z -mx9 Achievement.Watchdog.7z dist\\*
-
-      # Step 8: Upload the artifact for later download
+      # Step 9: Upload the artifact for later download
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Achievement.Watchdog
-          path: Achievement.Watchdog.7z
+          path: 'Achievement Watchdog\'
+          compression-level: 9
+          include-hidden-files: true
+          if-no-files-found: error
