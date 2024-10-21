@@ -62,9 +62,6 @@ for game_path in games_paths:
                         "game_achievements_path": os.path.join(os.path.dirname(appid_file), "achievements.json")
                     })
 
-# Clear the screen
-os.system('cls' if os.name == 'nt' else 'clear')
-
 # Display the list of matching games or exit if none found
 if not matching_games:
     print(Fore.LIGHTRED_EX + "No games found with matching steam_appid.txt files.")
