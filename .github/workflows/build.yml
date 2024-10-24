@@ -52,7 +52,7 @@ jobs:
           copy .env "Achievement Watchdog\\"
           copy assets\\achievement_sound.mp3 "Achievement Watchdog\\"
 
-      # Step 9: Upload the artifact for later download
+      # Step 8: Upload the artifact for later download
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
