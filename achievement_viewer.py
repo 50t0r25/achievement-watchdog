@@ -10,9 +10,6 @@ from dotenv import load_dotenv # type: ignore
 # Load environment variables from the .env file
 load_dotenv()
 
-# Initialize colorama for colored output
-init(autoreset=True)
-
 # Parse command-line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("-nohide", action="store_true", help="Show hidden achievements descriptions")
@@ -27,6 +24,8 @@ if args.nocolor:
     Fore.LIGHTRED_EX = ""
     Fore.WHITE = ""
 else:
+    # Initialize colorama for colored output
+    init(autoreset=True)
     Fore.GREEN = Fore.GREEN
     Fore.CYAN = Fore.CYAN
     Fore.YELLOW = Fore.YELLOW
