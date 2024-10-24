@@ -13,15 +13,30 @@ load_dotenv()
 # Initialize colorama for colored output
 init(autoreset=True)
 
+# Parse command-line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("-nohide", action="store_true", help="Show hidden achievements descriptions")
+parser.add_argument("-nocolor", action="store_true", help="Disable colored output")
+args = parser.parse_args()
+
+# If the -nocolor argument is provided, set all colors to white or empty
+if args.nocolor:
+    Fore.GREEN = ""
+    Fore.CYAN = ""
+    Fore.YELLOW = ""
+    Fore.LIGHTRED_EX = ""
+    Fore.WHITE = ""
+else:
+    Fore.GREEN = Fore.GREEN
+    Fore.CYAN = Fore.CYAN
+    Fore.YELLOW = Fore.YELLOW
+    Fore.LIGHTRED_EX = Fore.LIGHTRED_EX
+    Fore.WHITE = Fore.WHITE
+
 # Function to convert Unix time to a readable format
 def convert_from_unixtime(unix_time):
     return (Fore.GREEN + datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d %H:%M:%S')
             if unix_time > 0 else Fore.CYAN + "Not Earned")
-
-# Parse command-line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("-nohide", action="store_true", help="Show hidden achievements descriptions")
-args = parser.parse_args()
 
 # Load paths from environment variables (with defaults)
 local_achievements_path = os.getenv("LOCAL_ACHIEVEMENTS_PATH", r"%appdata%\GSE saves")
