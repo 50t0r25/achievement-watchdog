@@ -80,7 +80,13 @@ def map_local_folders_to_games():
 
                             # Move on to the next local folder once the match is found
                             break
-    
+
+    # Log the game cache or log a message if no games were found
+    if game_cache:
+        logging.info(f"Game Cache loaded - {game_cache}")
+    else:
+        logging.warning("No games to map have been found. Game Cache is empty.")
+
     return game_cache
 
 # Watchdog handler class
@@ -213,10 +219,10 @@ def start_tray(observer):
 
 # Main watchdog function
 def run_watchdog_mode():
-    logging.info("Running in Watchdog mode, monitoring for achievement changes...")
-
     # Scan the existing folders and create the cache
     game_cache = map_local_folders_to_games()
+
+    logging.info("Running Watchdog, monitoring for achievement changes...")
 
     observer = Observer()
     event_handler = AchievementHandler(game_cache)
