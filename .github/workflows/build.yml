@@ -34,25 +34,39 @@ jobs:
       # Step 4: Compile Achievement Watchdog executable
       - name: Build Achievement Watchdog
         run: |
-          pyinstaller --noconsole --add-data "assets\\achievement.png;." --icon "assets\\achievement.ico" --name "Achievement Watchdog" --optimize 2 --onefile .\achievement_watchdog.py
+          pyinstaller --noconsole --add-data "assets\\achievement.png;." --icon "assets\\achievement.ico" --name "Achievement Watchdog" --optimize 2 .\achievement_watchdog.py
 
       # Step 5: Compile Achievement Viewer executable
       - name: Build Achievement Viewer
         run: |
-          pyinstaller --icon "assets\\achievement_av.ico" --name "Achievement Viewer" --optimize 2 --onefile .\achievement_viewer.py
+          pyinstaller --icon "assets\\achievement_av.ico" --name "Achievement Viewer" --optimize 2 .\achievement_viewer.py
 
-      # Step 6: Verify and Rename the dist directory
+      # Step 6: Adjust files for Achievement Watchdog
+      - name: Prepare Achievement Watchdog files
+        run: |
+          move "dist\\Achievement Watchdog\\Achievement Watchdog.exe" "dist\\Achievement Watchdog.exe"
+          xcopy "dist\\Achievement Watchdog\\_internal\\*" "dist\\_internal\\" /E /Y
+          Remove-Item -Path "dist\\Achievement Watchdog" -Recurse -Force
+
+      # Step 7: Adjust files for Achievement Viewer
+      - name: Prepare Achievement Viewer files
+        run: |
+          move "dist\\Achievement Viewer\\Achievement Viewer.exe" "dist\\Achievement Viewer.exe"
+          xcopy "dist\\Achievement Viewer\\_internal\\*" "dist\\_internal\\" /E /Y 
+          Remove-Item -Path "dist\\Achievement Viewer" -Recurse -Force
+
+      # Step 8: Rename dist directory
       - name: Rename dist directory
         run: |
           ren dist "Achievement Watchdog"
 
-      # Step 7: Add additional files to the renamed directory
+      # Step 9: Add additional files to the renamed directory
       - name: Copy additional files
         run: |
           copy .env "Achievement Watchdog\\"
           copy assets\\achievement_sound.mp3 "Achievement Watchdog\\"
 
-      # Step 8: Upload the artifact for later download
+      # Step 10: Upload the artifact for later download
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
