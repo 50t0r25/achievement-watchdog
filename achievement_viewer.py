@@ -66,16 +66,25 @@ for game_path in games_paths:
 
     for folder in os.listdir(local_achievements_path):
         folder_name = folder
+        processed_folders = set()  # To track processed root folders
+
         for appid_file in appid_files:
+            root_folder = os.path.relpath(os.path.dirname(appid_file), game_path).split(os.sep)[0]
+
+            # Skip if we've already processed this root folder
+            if root_folder in processed_folders:
+                continue
+
             with open(appid_file, 'r', encoding='utf-8') as f:
                 if f.read().strip() == folder_name:
-                    root_folder = os.path.relpath(os.path.dirname(appid_file), game_path).split(os.sep)[0]
                     matching_games.append({
                         "name": folder_name,
                         "root_folder": root_folder,
                         "local_folder": os.path.join(local_achievements_path, folder_name),
                         "game_achievements_path": os.path.join(os.path.dirname(appid_file), "achievements.json")
                     })
+                    processed_folders.add(root_folder)  # Mark this root folder as processed
+                    break  # Stop processing more appid files for this folder
 
 # Display the list of matching games or exit if none found
 if not matching_games:
