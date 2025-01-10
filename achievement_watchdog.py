@@ -27,7 +27,10 @@ def load_json(file_path):
 
 # Function to get the display text for a specific language, with fallback to English
 def get_display_text(recent_achievement, key, language):
-    # Attempt to get the text in the specified language; fallback to English if not available
+    # If the key is a string, return it directly
+    if isinstance(recent_achievement.get(key), str):
+        return recent_achievement[key]
+    # Otherwise, attempt to get the text for the specified language or fallback
     return recent_achievement.get(key, {}).get(language) or recent_achievement.get(key, {}).get('english', 'Unknown')
 
 # Function to find the most recent earned achievement
