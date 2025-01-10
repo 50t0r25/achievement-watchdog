@@ -50,11 +50,15 @@ games_paths = [os.path.expandvars(path.strip()) for path in games_paths]
 
 # Function to load JSON data from a file
 def load_json(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, 'r', encoding='utf-8-sig') as f:
         return json.load(f)
 
 # Function to get the achievement text in the preferred language, with a fallback to English
 def get_achievement_text(recent_achievement, key):
+    # Check if the key is a string, return it directly
+    if isinstance(recent_achievement.get(key), str):
+        return recent_achievement[key]
+    # Otherwise, attempt to get the text for the preferred language or fallback
     return recent_achievement.get(key, {}).get(preferred_language) or \
            recent_achievement.get(key, {}).get('english', 'Unknown')
 
