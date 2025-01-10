@@ -22,7 +22,7 @@ logging.basicConfig(filename="achievement_watchdog.log", level=logging.INFO,
 
 # Function to load JSON data from a file
 def load_json(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, 'r', encoding='utf-8-sig') as f:
         return json.load(f)
 
 # Function to get the display text for a specific language, with fallback to English
